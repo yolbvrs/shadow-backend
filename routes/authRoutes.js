@@ -43,6 +43,16 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/providers', async (req, res) => {
+    try {
+        const providers = await User.find({ role: 'provider' }).select('-password'); // Exclude passwords
+        res.json(providers);
+    } catch (error) {
+        console.error("Error fetching providers:", error);
+        res.status(500).json({ msg: 'Server error', error: error.message });
+    }
+});
+
 module.exports = router;
  
 // GET Logged-In User's Details
