@@ -9,9 +9,12 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: "https://yolbvrs.github.io", // Allows requests from GitHub Pages
+    origin: "https://yolbvrs.github.io",  // Allow frontend requests
     methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
     credentials: true
+}));
+
 
 // Connect to MongoDB
 connectDB();
