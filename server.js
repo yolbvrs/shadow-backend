@@ -2,10 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config');
 const authRoutes = require('./routes/authRoutes');
-const jobRoutes = require('./routes/jobRoutes'); // ✅ Import the new job routes
+const jobRoutes = require('./routes/jobRoutes'); // ✅ Import job routes
 
 require('dotenv').config();
-const app = express();
+const app = express(); // ✅ Ensure `app` is declared BEFORE using it
 
 app.use(express.json());
 app.use(cors({
@@ -13,7 +13,6 @@ app.use(cors({
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true
-app.use('/api/jobs', jobRoutes);
 }));
 
 // Connect to MongoDB
@@ -24,11 +23,9 @@ app.get('/', (req, res) => {
     res.send('Welcome to SHADOW!🚀');
 });
 
-// Authentication Routes
+// ✅ Make sure `app.use` is placed AFTER declaring `app`
 app.use('/api/auth', authRoutes);
-
-// ✅ Register the job request routes
-app.use('/api/jobs', jobRoutes);
+app.use('/api/jobs', jobRoutes);  // ✅ Job routes now properly registered
 
 // Server Port
 const PORT = process.env.PORT || 5000;
