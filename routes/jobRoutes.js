@@ -3,7 +3,7 @@ const router = express.Router();
 const Job = require('../models/Job');
 const User = require('../models/User');
 
-// ✅ Debugging Job Request API
+// ✅ Corrected: Save Job Request (Must be a POST request)
 router.post('/request', async (req, res) => {
     try {
         console.log("Received Job Request:", req.body); // Debugging
@@ -35,3 +35,5 @@ router.post('/request', async (req, res) => {
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
+module.exports = router;
