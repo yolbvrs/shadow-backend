@@ -45,3 +45,20 @@ router.post('/login', async (req, res) => {
 
 module.exports = router;
  
+// GET Logged-In User's Details
+router.get('/user', async (req, res) => {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const user = await User.findById(decoded.id).select('-password'); // Remove password for security
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        res.json(user); // Send user details (including role)
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(401).json({ msg: 'Invalid or expired token' });
+    }
+});
