@@ -1,9 +1,7 @@
- 
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config');
 const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
 
 require('dotenv').config();
 const app = express();
@@ -16,7 +14,6 @@ app.use(cors({
     credentials: true
 }));
 
-
 // Connect to MongoDB
 connectDB();
 
@@ -25,7 +22,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to SHADOW!🚀');
 });
 
-// Authentication Routes
+// Authentication Routes (Moved below app initialization)
 app.use('/api/auth', authRoutes);
 
 // Server Port
