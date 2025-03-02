@@ -43,6 +43,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// GET all registered security providers
 router.get('/providers', async (req, res) => {
     try {
         const providers = await User.find({ role: 'provider' }).select('-password'); // Exclude passwords
@@ -53,8 +54,6 @@ router.get('/providers', async (req, res) => {
     }
 });
 
-module.exports = router;
- 
 // GET Logged-In User's Details
 router.get('/user', async (req, res) => {
     try {
@@ -72,3 +71,6 @@ router.get('/user', async (req, res) => {
         res.status(401).json({ msg: 'Invalid or expired token' });
     }
 });
+
+// ✅ Move this line to the **end of the file**
+module.exports = router;
