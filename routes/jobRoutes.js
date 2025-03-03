@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
 const User = require('../models/User');
-const sanitizeHtml = require('sanitize-html'); // Prevents XSS attacks
 
 // ✅ Create Job Request (POST)
 router.post('/request', async (req, res) => {
@@ -53,27 +52,19 @@ router.post('/request', async (req, res) => {
 });
 
 // ✅ Accept or Reject Job Request
-router.put('/update/:jobId', async (req, res) => {
+// ✅ Get all job requests for a specific customer
+router.get('/customer/:customerId', async (req, res) => {
     try {
-        const { status } = req.body; // Expecting "Accepted" or "Rejected"
-        
-        if (!["Accepted", "Rejected"].includes(status)) {
-            return res.status(400).json({ msg: "Invalid status update" });
+        const customerId = req.params.customerId;
+        const jobs = await Job.find({ customerId }).populate('providerId', 'name email');
+
+        if (!jobs.length) {
+            return res.status(404).json({ msg: "No job requests found for this customer" });
         }
 
-        const job = await Job.findByIdAndUpdate(
-            req.params.jobId,
-            { status },
-            { new: true } // Return the updated job
-        );
-
-        if (!job) {
-            return res.status(404).json({ msg: "Job not found" });
-        }
-
-        res.json({ msg: `Job ${status.toLowerCase()} successfully!`, job });
+        res.json(jobs);
     } catch (error) {
-        console.error("Error updating job status:", error);
+        console.error("Error fetching customer job requests:", error);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
