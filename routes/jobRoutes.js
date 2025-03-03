@@ -52,39 +52,28 @@ router.post('/request', async (req, res) => {
     }
 });
 
-// ✅ Accept or Reject Job Request (PUT)
+// ✅ Accept or Reject Job Request
 router.put('/update/:jobId', async (req, res) => {
     try {
-        console.log("🔄 Updating Job Status:", req.params.jobId);
-
-        const { status, userId } = req.body; // Expecting "Accepted" or "Rejected"
-
+        const { status } = req.body; // Expecting "Accepted" or "Rejected"
+        
         if (!["Accepted", "Rejected"].includes(status)) {
-            console.log("❌ Invalid status update:", status);
             return res.status(400).json({ msg: "Invalid status update" });
         }
 
-        // Find job and verify it exists
-        const job = await Job.findById(req.params.jobId);
+        const job = await Job.findByIdAndUpdate(
+            req.params.jobId,
+            { status },
+            { new: true } // Return the updated job
+        );
+
         if (!job) {
-            console.log("❌ Job not found:", req.params.jobId);
             return res.status(404).json({ msg: "Job not found" });
         }
 
-        // Ensure only the provider can update job status
-        if (job.providerId.toString() !== userId) {
-            console.log("⛔ Unauthorized attempt to update job:", userId);
-            return res.status(403).json({ msg: "Unauthorized to update this job" });
-        }
-
-        // Update job status
-        job.status = status;
-        await job.save();
-
-        console.log(`✅ Job ${status.toLowerCase()} successfully!`, job);
         res.json({ msg: `Job ${status.toLowerCase()} successfully!`, job });
     } catch (error) {
-        console.error("🚨 Error updating job status:", error);
+        console.error("Error updating job status:", error);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
