@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Job = require('../models/Job');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware'); // ✅ Import middleware
 
 // ✅ Create Job Request (POST)
 router.post('/request', async (req, res) => {
@@ -65,6 +66,25 @@ router.get('/customer/:customerId', async (req, res) => {
         res.json(jobs);
     } catch (error) {
         console.error("Error fetching customer job requests:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
+    }
+});
+
+// ✅ Protect job request API
+router.post('/request', authMiddleware, async (req, res) => {
+    try {
+        const { customerId, providerId, jobDetails } = req.body;
+
+        if (!customerId || !providerId || !jobDetails) {
+            return res.status(400).json({ msg: "Missing required fields" });
+        }
+
+        const job = new Job({ customerId, providerId, jobDetails, status: "Pending" });
+        await job.save();
+
+        res.json({ msg: "Job request sent successfully!", job });
+    } catch (error) {
+        console.error("Error sending job request:", error);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });

@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware'); // ✅ Import middleware
 
 const router = express.Router();
 
@@ -69,6 +70,21 @@ router.get('/user', async (req, res) => {
     } catch (error) {
         console.error("Error fetching user:", error);
         res.status(401).json({ msg: 'Invalid or expired token' });
+    }
+});
+
+// ✅ Protect the user details route
+router.get('/user', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
 

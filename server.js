@@ -1,8 +1,10 @@
+const authMiddleware = require('./middleware/authMiddleware');
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes'); // ✅ Import job routes
+
 
 require('dotenv').config();
 const app = express(); // ✅ Ensure `app` is declared BEFORE using it
