@@ -36,4 +36,30 @@ router.post('/request', async (req, res) => {
     }
 });
 
+// ✅ Accept or Reject Job Request
+router.put('/update/:jobId', async (req, res) => {
+    try {
+        const { status } = req.body; // Expecting "Accepted" or "Rejected"
+        
+        if (!["Accepted", "Rejected"].includes(status)) {
+            return res.status(400).json({ msg: "Invalid status update" });
+        }
+
+        const job = await Job.findByIdAndUpdate(
+            req.params.jobId,
+            { status },
+            { new: true } // Return the updated job
+        );
+
+        if (!job) {
+            return res.status(404).json({ msg: "Job not found" });
+        }
+
+        res.json({ msg: `Job ${status.toLowerCase()} successfully!`, job });
+    } catch (error) {
+        console.error("Error updating job status:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
+    }
+});
+
 module.exports = router;

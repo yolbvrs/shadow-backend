@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
 // GET all registered security providers
 router.get('/providers', async (req, res) => {
     try {
-        const providers = await User.find({ role: 'provider' }).select('-password'); // Exclude passwords
+        const providers = await User.find({ role: 'provider' }).select('-password');
         res.json(providers);
     } catch (error) {
         console.error("Error fetching providers:", error);
