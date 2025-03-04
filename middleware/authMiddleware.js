@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
     const authHeader = req.header('Authorization');
-    
-    if (!authHeader) {
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ msg: "No token, authorization denied" });
     }
 
-    const token = authHeader.replace('Bearer ', ''); // ✅ Prevents error if authHeader is undefined
+    const token = authHeader.replace('Bearer ', ''); // ✅ Prevents error when token is missing
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
