@@ -1,9 +1,8 @@
-const jwt = require('jsonwebtoken');
 const express = require('express');
-const bcrypt = require('bcryptjs');
+const router = express.Router();
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const authMiddleware = require('../middleware/authMiddleware'); // ✅ Import middleware
-
+const authMiddleware = require('../middleware/authMiddleware'); // ✅ Ensure this is imported
 const router = express.Router();
 
 // Signup Endpoint
