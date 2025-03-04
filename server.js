@@ -1,34 +1,32 @@
-const authMiddleware = require('./middleware/authMiddleware');
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config');
-const authRoutes = require('./routes/authRoutes');
-const jobRoutes = require('./routes/jobRoutes'); // ✅ Import job routes
-
-
+const connectDB = require('./config'); // ✅ Connect MongoDB
+const authRoutes = require('./routes/authRoutes'); // ✅ Authentication Routes
+const jobRoutes = require('./routes/jobRoutes'); // ✅ Job Management Routes
 require('dotenv').config();
-const app = express(); // ✅ Ensure `app` is declared BEFORE using it
+
+const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: "https://yolbvrs.github.io",  // Allow frontend access
+    origin: "https://yolbvrs.github.io",  // ✅ Allow frontend to communicate with backend
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true
 }));
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB
 connectDB();
 
-// Test Route (To check if server is running)
+// ✅ Base Test Route (Check if Server is Running)
 app.get('/', (req, res) => {
     res.send('Welcome to SHADOW!🚀');
 });
 
-// ✅ Make sure `app.use` is placed AFTER declaring `app`
+// ✅ Use Authentication & Job Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/jobs', jobRoutes);  // ✅ Job routes now properly registered
+app.use('/api/jobs', jobRoutes); // ✅ Ensures job routes work
 
-// Server Port
+// ✅ Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
