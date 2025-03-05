@@ -26,4 +26,25 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+router.get('/user', async (req, res) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '');
+        if (!token) {
+            return res.status(401).json({ msg: "No token, authorization denied" });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password'); // ✅ Make sure this is correct
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error("❌ Error fetching user:", error.message);
+        res.status(401).json({ msg: "Invalid or expired token" });
+    }
+});
+
 module.exports = router;
