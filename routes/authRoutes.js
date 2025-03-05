@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router(); // ✅ Declare router only once
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/User'); // ✅ Now pulling from User.js
 const authMiddleware = require('../middleware/authMiddleware'); // ✅ Ensure middleware is imported
 
 // ✅ User Authentication Route (Check Logged-in User)
