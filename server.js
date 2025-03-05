@@ -12,6 +12,9 @@ app.use(cors()); // Allows cross-origin requests
 // ✅ Test Route (Check if API is Working)
 app.get('/api/test', (req, res) => {
     res.json({ msg: "✅ API is working!" });
+
+console.log("✅ Server is running...");
+
 });
 
 // ✅ Sample Route for Authentication Testing
@@ -26,6 +29,19 @@ connectDB();
 app.get('/', (req, res) => {
     res.send('Welcome to SHADOW API 🚀');
 });
+
+// ✅ Load Routes
+try {
+    const authRoutes = require('./routes/authRoutes');
+    const jobRoutes = require('./routes/jobRoutes');
+
+    console.log("✅ Routes loaded successfully!");
+
+    app.use('/api/auth', authRoutes);
+    app.use('/api/jobs', jobRoutes);
+} catch (error) {
+    console.error("🚨 Error loading routes:", error.message);
+}
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
