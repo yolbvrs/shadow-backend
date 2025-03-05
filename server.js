@@ -18,6 +18,14 @@ app.get('/api/auth/test', (req, res) => {
     res.json({ msg: "✅ Auth route is working!" });
 });
 
+// ✅ Connect to MongoDB
+connectDB();
+
+// ✅ Test Route (Check if Server is Running)
+app.get('/', (req, res) => {
+    res.send('Welcome to SHADOW API 🚀');
+});
+
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
