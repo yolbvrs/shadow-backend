@@ -1,49 +1,45 @@
 const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // ✅ Make sure this is correct
+const config = require('config'); // If using config for JWT_SECRET
 
-const router = express.Router();
-
-// ✅ Sign-Up Route
-router.post('/signup', async (req, res) => {
+// ✅ User Registration Route (Public, No Token Required)
+router.post('/register', async (req, res) => {
     try {
-        const { name, email, phone, experience, specialties, idNumber, password, role } = req.body;
+        const { name, email, password, role } = req.body;
 
+        // Check if user already exists
         let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ msg: 'User already exists' });
+        if (user) {
+            return res.status(400).json({ msg: "User already exists" });
+        }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        user = new User({ name, email, phone, experience, specialties, idNumber, password: hashedPassword, role });
+        // Create new user
+        user = new User({
+            name,
+            email,
+            password: hashedPassword,
+            role
+        });
+
         await user.save();
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token, msg: 'User registered successfully!' });
+        // ✅ Generate JWT Token
+        const payload = { user: { id: user.id } };
+        jwt.sign(payload, process.env.JWT_SECRET || "your_secret", { expiresIn: "7d" }, (err, token) => {
+            if (err) throw err;
+            res.json({ token, user });
+        });
+
     } catch (error) {
-        console.error("❌ Error in signup:", error.message);
-        res.status(500).json({ msg: 'Server error', error: error.message });
-    }
-});
-
-router.get('/user', async (req, res) => {
-    try {
-        const token = req.header('Authorization')?.replace('Bearer ', '');
-        if (!token) {
-            return res.status(401).json({ msg: "No token, authorization denied" });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select('-password'); // ✅ Make sure this is correct
-
-        if (!user) {
-            return res.status(404).json({ msg: "User not found" });
-        }
-
-        res.json(user);
-    } catch (error) {
-        console.error("❌ Error fetching user:", error.message);
-        res.status(401).json({ msg: "Invalid or expired token" });
+        console.error("🚨 Registration Error:", error);
+        res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
 
